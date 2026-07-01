@@ -1,4 +1,5 @@
 if __name__ == '__main__':
+    pass
 
     # assumi che esistano i file captions.json, train_images.txt, ecc.
     # Assume captions are alredy clean
