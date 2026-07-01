@@ -17,6 +17,9 @@ if __name__ == '__main__':
     # add <start> ed <end>???
 
     # 4) create training set and val set (triplets (image id, input_seq, SINGLE target_token)
-    # proviamo a usare tf.data
+        # tokenizer
+        # proviamo a usare tf.data
 
     # 5) train model
+
+    # 6) generate test captions
