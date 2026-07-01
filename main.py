@@ -49,7 +49,7 @@ def preprocess_dataset(path):
     # -----------------------------
     # Salva il risultato
     # -----------------------------
-    with open("Flickr8k/captions/captions_clean.json", "w") as f:
+    with open("Flickr8k/captions/captions.json", "w") as f:
         json.dump(data, f, indent=4)
 
     print("Pulizia completata.")
