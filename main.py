@@ -5,60 +5,54 @@ from collections import defaultdict
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
 def preprocess_dataset(path):
-    from collections import Counter
+    import json
+    import string
 
     # -----------------------------
-    # Carica gli split
+    # Funzione di pulizia
     # -----------------------------
-    def load_images(path):
-        with open(path, "r") as f:
-            return [line.strip() for line in f if line.strip()]
+    def clean_caption(caption):
+        # lowercase
+        caption = caption.lower()
 
-    train_images = load_images("Flickr8k/captions/train_images.txt")
-    val_images = load_images("Flickr8k/captions/val_images.txt")
-    test_images = load_images("Flickr8k/captions/test_images.txt")
+        # remove punctuation
+        caption = caption.translate(str.maketrans("", "", string.punctuation))
 
-    # -----------------------------
-    # Controlla duplicati nello stesso file
-    # -----------------------------
-    for name, images in [
-        ("train", train_images),
-        ("val", val_images),
-        ("test", test_images),
-    ]:
-        counter = Counter(images)
-        duplicates = [img for img, count in counter.items() if count > 1]
+        # split into words
+        words = caption.split()
 
-        print(f"{name}: {len(images)} immagini")
+        # remove short words and words containing digits
+        words = [
+            word
+            for word in words
+            if len(word) > 1 and word.isalpha()
+        ]
 
-        if duplicates:
-            print(f"  Duplicati ({len(duplicates)}):")
-            for img in duplicates:
-                print(f"    {img} ({counter[img]} volte)")
-        else:
-            print("  Nessun duplicato")
+        return " ".join(words)
 
     # -----------------------------
-    # Trasforma in set
+    # Carica il JSON
     # -----------------------------
-    train_set = set(train_images)
-    val_set = set(val_images)
-    test_set = set(test_images)
+    with open("Flickr8k/captions/captions.json", "r") as f:
+        data = json.load(f)
 
     # -----------------------------
-    # Controlla sovrapposizioni
+    # Pulisci tutte le caption
     # -----------------------------
-    print("\nSovrapposizioni:")
-    print("train ∩ val :", len(train_set & val_set))
-    print("train ∩ test:", len(train_set & test_set))
-    print("val ∩ test  :", len(val_set & test_set))
+    for split in ("train", "val", "test"):
+        for image, captions in data[split].items():
+            data[split][image] = [
+                clean_caption(caption)
+                for caption in captions
+            ]
 
     # -----------------------------
-    # Numero totale di immagini
+    # Salva il risultato
     # -----------------------------
-    all_images = train_set | val_set | test_set
+    with open("Flickr8k/captions/captions_clean.json", "w") as f:
+        json.dump(data, f, indent=4)
 
-    print("\nTotale immagini uniche:", len(all_images))
+    print("Pulizia completata.")
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
